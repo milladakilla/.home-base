@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#Get option-1 and remove a trailing '/' if it exists.
+DIR_TO_ARCHIVE=${1%/}
+
+DATE_STAMP=$(date +%Y%m%d-%H%M)
+ARCHIVE_NAME="${DIR_TO_ARCHIVE}.${DATE_STAMP}.tar.gz"
+
+if [[ ! -d $DIR_TO_ARCHIVE ]]; then
+  echo "ERROR: $DIR_TO_ARCHIVE is NOT a directory."
+  exit 1
+fi
+
+tar cfpz $ARCHIVE_NAME $DIR_TO_ARCHIVE
+TAR_EXIT_CODE=$?
+
+echo "INFO: exit code of tar was ${TAR_EXIT_CODE}."
+exit $TAR_EXIT_CODE
