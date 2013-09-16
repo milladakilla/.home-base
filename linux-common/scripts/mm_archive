@@ -1,10 +1,31 @@
 #!/bin/bash
+###############################################################################
+
+  #Author: Matt Miller
+  #Date:   2013-SEP-16
+###############################################################################
 
 #Get option-1 and remove a trailing '/' if it exists.
 DIR_TO_ARCHIVE=${1%/}
 
 DATE_STAMP=$(date +%Y%m%d-%H%M)
 ARCHIVE_NAME="${DIR_TO_ARCHIVE}.${DATE_STAMP}.tar.gz"
+
+function usage {
+  echo "## Usage ##"
+  echo
+  echo "  mm_archive /path/to/dir/to/archive"
+  echo
+  echo "This script will create a tar.gz of the directory you have have"
+  echo "passed as an argument.  The name format of the archive will be"
+  echo "./dir_name.YYYYMMDD-HHMM.tar.gz ."
+}
+
+if [[ -z $1 ]] ; then
+  echo "ERROR: This script takes one and only one argument."
+  usage
+  exit 1
+fi
 
 if [[ ! -d $DIR_TO_ARCHIVE ]]; then
   echo "ERROR: $DIR_TO_ARCHIVE is NOT a directory."
