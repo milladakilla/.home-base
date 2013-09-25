@@ -5,35 +5,56 @@
   #Date:   2013-SEP-16
 ###############################################################################
 
-#Get option-1 and remove a trailing '/' if it exists.
-DIR_TO_ARCHIVE=${1%/}
+# Get option-1 and remove a trailing '/' if it exists.
+THING_TO_ARCHIVE=${1%/}
 
 DATE_STAMP=$(date +%Y%m%d-%H%M)
-ARCHIVE_NAME="${DIR_TO_ARCHIVE}.${DATE_STAMP}.tar.gz"
+ARCHIVE_NAME="${THING_TO_ARCHIVE}.${DATE_STAMP}"
+ARCHIVE_NAME_TAR_GZ="${ARCHIVE_NAME}.tar.gz"
 
 function usage {
   echo "## Usage ##"
   echo
-  echo "  mm_archive /path/to/dir/to/archive"
+  echo "  mm_archive /path/to/thing/to/archive"
   echo
   echo "This script will create a tar.gz of the directory you have have"
   echo "passed as an argument.  The name format of the archive will be"
   echo "./dir_name.YYYYMMDD-HHMM.tar.gz ."
 }
 
+# Make sure the command line looks good.
 if [[ -z $1 ]] ; then
   echo "ERROR: This script takes one and only one argument."
   usage
   exit 1
 fi
 
-if [[ ! -d $DIR_TO_ARCHIVE ]]; then
-  echo "ERROR: $DIR_TO_ARCHIVE is NOT a directory."
-  exit 1
+# Handle a file archive.
+if [[ -f $THING_TO_ARCHIVE ]] ; then
+  cp $THING_TO_ARCHIVE $ARCHIVE_NAME
+  
+  if [[ $? != 0 ]] ; then
+    echo "ERROR: Could not archive the file '${THING_TO_ARCHIVE}'."
+    exit 2
+  fi
+
+  echo "INFO: Archived your file '${THING_TO_ARCHIVE}' to '${ARCHIVE_NAME}'."
+  exit 0
 fi
 
-tar cfpz $ARCHIVE_NAME $DIR_TO_ARCHIVE
-TAR_EXIT_CODE=$?
+# Handle a directory archive.
+if [[ -d $THING_TO_ARCHIVE ]] ; then
+  tar cfpz $ARCHIVE_NAME_TAR_GZ $THING_TO_ARCHIVE
+  
+  if [[ $? != 0 ]] ; then
+    echo "ERROR: Could not archive the directory '${THING_TO_ARCHIVE}'"
+    exit 3
+  fi
 
-echo "INFO: exit code of tar was ${TAR_EXIT_CODE}."
-exit $TAR_EXIT_CODE
+  echo "INFO: Archived your directory '${THING_TO_ARCHIVE}' to '${ARCHIVE_NAME_TAR_GZ}'."
+  exit 0
+fi
+
+# In case the argument has not been handled yet.
+echo "ERROR: This script will only archive files and directories."
+exit 4
